@@ -14,8 +14,8 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <section
         className="relative w-full py-20 md:py-32 lg:py-40 text-white bg-cover bg-center"
-        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1620663765968-042858dec34d?q=80&w=1920&auto=format&fit=crop')" }}
-        data-ai-hint="kazakh ornament background"
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1599846824275-535b4b4b3c43?q=80&w=1920&auto=format&fit=crop')" }}
+        data-ai-hint="kazakh pattern"
       >
         <div className="absolute inset-0 bg-black/60" />
         <div className="container relative z-10 mx-auto px-4 md:px-6 text-center">
