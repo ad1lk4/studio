@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, createContext, useContext, ReactNode } from 'react';
+import React, { useState, useEffect, useCallback, createContext, useContext, ReactNode } from 'react';
 
 interface Progress {
   xp: number;
@@ -60,11 +60,7 @@ export const ProgressProvider = ({ children }: { children: ReactNode }) => {
     });
   }, [saveProgress]);
 
-  return (
-    <ProgressContext.Provider value={{ progress, completeLesson, isLoading }}>
-      {children}
-    </ProgressContext.Provider>
-  );
+  return React.createElement(ProgressContext.Provider, { value: { progress, completeLesson, isLoading } }, children);
 };
 
 export const useProgress = (): ProgressContextType => {
