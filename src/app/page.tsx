@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Zap, Trophy } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { KazakhOrnament } from '@/components/KazakhOrnament';
 
 const heroImage = PlaceHolderImages.find((img) => img.id === 'hero');
 const feature1Image = PlaceHolderImages.find((img) => img.id === 'feature-1');
@@ -14,43 +13,32 @@ const feature3Image = PlaceHolderImages.find((img) => img.id === 'feature-3');
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
-      <section className="relative w-full py-20 md:py-32 lg:py-40 bg-card overflow-hidden">
-        <div className="container mx-auto px-4 md:px-6 text-center">
-          <div className="absolute inset-0 z-0 opacity-5">
-            <KazakhOrnament className="absolute -top-1/4 -left-1/4 w-[50vw] h-[50vw] text-primary" />
-            <KazakhOrnament className="absolute -bottom-1/4 -right-1/4 w-[50vw] h-[50vw] text-accent" />
-          </div>
-          <div className="relative z-10">
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-              Изучай казахский язык с <span className="text-primary">Sөyle!</span>
-            </h1>
-            <p className="mt-6 max-w-3xl mx-auto text-lg text-muted-foreground md:text-xl">
-              Погрузись в мир казахской культуры через увлекательные уроки и интерактивные задания. Начни свой путь к свободному владению языком уже сегодня!
-            </p>
-            <div className="mt-10">
-              <Button asChild size="lg" className="text-lg">
-                <Link href="/learn">Начать обучение</Link>
-              </Button>
-            </div>
+      <section className="relative w-full py-20 md:py-32 lg:py-40 text-white">
+        {heroImage && (
+          <Image
+            src={heroImage.imageUrl}
+            alt={heroImage.description}
+            fill
+            className="object-cover"
+            data-ai-hint={heroImage.imageHint}
+            priority
+          />
+        )}
+        <div className="absolute inset-0 bg-black/60" />
+        <div className="container relative z-10 mx-auto px-4 md:px-6 text-center">
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
+            Изучай казахский язык с <span className="text-primary">Sөyle!</span>
+          </h1>
+          <p className="mt-6 max-w-3xl mx-auto text-lg text-slate-100 md:text-xl">
+            Погрузись в мир казахской культуры через увлекательные уроки и интерактивные задания. Начни свой путь к свободному владению языком уже сегодня!
+          </p>
+          <div className="mt-10">
+            <Button asChild size="lg" className="text-lg">
+              <Link href="/learn">Начать обучение</Link>
+            </Button>
           </div>
         </div>
       </section>
-
-      {heroImage && (
-        <section className="container mx-auto px-4 md:px-6 my-16">
-          <div className="w-full h-64 md:h-96 relative rounded-xl overflow-hidden shadow-2xl">
-            <Image
-              src={heroImage.imageUrl}
-              alt={heroImage.description}
-              fill
-              className="object-cover"
-              data-ai-hint={heroImage.imageHint}
-              priority
-            />
-             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-          </div>
-        </section>
-      )}
 
       <section className="w-full py-16 bg-background">
         <div className="container mx-auto px-4 md:px-6">
