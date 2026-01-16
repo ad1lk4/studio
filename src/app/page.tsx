@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Zap, Trophy } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
-const heroImage = PlaceHolderImages.find((img) => img.id === 'hero');
 const feature1Image = PlaceHolderImages.find((img) => img.id === 'feature-1');
 const feature2Image = PlaceHolderImages.find((img) => img.id === 'feature-2');
 const feature3Image = PlaceHolderImages.find((img) => img.id === 'feature-3');
@@ -15,8 +14,8 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <section
         className="relative w-full py-20 md:py-32 lg:py-40 text-white bg-cover bg-center"
-        style={{ backgroundImage: heroImage ? `url('${heroImage.imageUrl}')` : 'none' }}
-        data-ai-hint={heroImage?.imageHint}
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1594903335541-da6348873099?q=80&w=1920')" }}
+        data-ai-hint="red ornament pattern"
       >
         <div className="absolute inset-0 bg-black/60" />
         <div className="container relative z-10 mx-auto px-4 md:px-6 text-center">
