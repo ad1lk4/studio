@@ -22,7 +22,7 @@ export default function Home() {
           </div>
           <div className="relative z-10">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-              Изучай казахский язык с <span className="text-primary">KazakhLingua</span>
+              Изучай казахский язык с <span className="text-primary">Sөyle!</span>
             </h1>
             <p className="mt-6 max-w-3xl mx-auto text-lg text-muted-foreground md:text-xl">
               Погрузись в мир казахской культуры через увлекательные уроки и интерактивные задания. Начни свой путь к свободному владению языком уже сегодня!
@@ -54,7 +54,7 @@ export default function Home() {
 
       <section className="w-full py-16 bg-background">
         <div className="container mx-auto px-4 md:px-6">
-          <h2 className="text-3xl font-bold text-center mb-12">Почему KazakhLingua?</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">Почему Sөyle!?</h2>
           <div className="grid gap-8 md:grid-cols-3">
             <Card>
               <CardHeader className="items-center">
@@ -119,7 +119,7 @@ export default function Home() {
 
       <footer className="w-full py-6 mt-auto bg-background">
         <div className="container mx-auto px-4 md:px-6 text-center text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} KazakhLingua. Все права защищены.</p>
+          <p>&copy; {new Date().getFullYear()} Sөyle!. Все права защищены.</p>
         </div>
       </footer>
     </div>

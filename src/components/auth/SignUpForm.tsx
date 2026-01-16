@@ -40,7 +40,7 @@ export function SignUpForm() {
     console.log(values)
     toast({
         title: "Регистрация успешна!",
-        description: "Добро пожаловать в KazakhLingua! (демо)",
+        description: "Добро пожаловать в Sөyle! (демо)",
     });
   }
 

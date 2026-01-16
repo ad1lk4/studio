@@ -26,7 +26,7 @@ export const ProgressProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     try {
-      const savedProgress = localStorage.getItem('kazakhLinguaProgress');
+      const savedProgress = localStorage.getItem('soyleProgress');
       if (savedProgress) {
         setProgress(JSON.parse(savedProgress));
       }
@@ -39,7 +39,7 @@ export const ProgressProvider = ({ children }: { children: ReactNode }) => {
 
   const saveProgress = useCallback((newProgress: Progress) => {
     try {
-      localStorage.setItem('kazakhLinguaProgress', JSON.stringify(newProgress));
+      localStorage.setItem('soyleProgress', JSON.stringify(newProgress));
       setProgress(newProgress);
     } catch (error) {
       console.error('Failed to save progress to localStorage', error);

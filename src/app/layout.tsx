@@ -12,7 +12,7 @@ const ptSans = PT_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'KazakhLingua - Изучай казахский легко!',
+  title: 'Sөyle! - Изучай казахский легко!',
   description: 'Интерактивное приложение для изучения казахского языка, вдохновленное Duolingo.',
 };
 
