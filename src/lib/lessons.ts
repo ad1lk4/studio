@@ -1,0 +1,236 @@
+import type { Section } from './types';
+
+export const sections: Section[] = [
+  {
+    id: 'section-1',
+    title: 'Базовые слова и фразы',
+    totalPoints: 20, // 10 lessons * 2 points
+    lessons: [
+      {
+        id: 's1-l1',
+        title: 'Приветствия',
+        sectionId: 'section-1',
+        points: 2,
+        tasks: [
+          {
+            id: 's1-l1-t1',
+            type: 'MULTIPLE_CHOICE',
+            question: 'Как переводится слово «Сәлем»?',
+            options: ['Здравствуйте', 'Спасибо', 'Пожалуйста', 'Дом'],
+            correctAnswer: 'Здравствуйте',
+          },
+          {
+            id: 's1-l1-t2',
+            type: 'SENTENCE_BUILDER',
+            question: 'Составь правильное предложение из данных слов.',
+            words: ['Сәлем,', 'қалайсың?', 'сен'],
+            correctAnswer: 'Сәлем, сен қалайсың?',
+          },
+          {
+            id: 's1-l1-t3',
+            type: 'TRUE_FALSE',
+            question: 'Верно ли утверждение? «Қайырлы таң!» = «Добрый день!»',
+            correctAnswer: false,
+            explanation: '«Қайырлы таң!» означает «Доброе утро!».',
+          },
+          {
+            id: 's1-l1-t4',
+            type: 'ODD_ONE_OUT',
+            question: 'Какое слово лишнее?',
+            options: ['Сәлем', 'Салем', 'Привет', 'Қош'],
+            correctAnswer: 'Привет',
+            explanation: '«Привет» - это русское слово, остальные - казахские приветствия.',
+          },
+          {
+            id: 's1-l1-t5',
+            type: 'MATCH_PAIRS',
+            question: 'Соотнеси казахские слова с их переводами.',
+            pairs: [
+              { prompt: 'Сәлем', answer: 'Привет' },
+              { prompt: 'Рахмет', answer: 'Спасибо' },
+              { prompt: 'Жақсы', answer: 'Хорошо' },
+            ],
+          },
+          {
+            id: 's1-l1-t6',
+            type: 'DIALOGUE_COMPLETION',
+            question: 'Как правильно продолжить диалог? «Сәлеметсіз бе?» → …',
+            options: ['Жақсы, рахмет', 'Сау болыңыз', 'Қош келдіңіз'],
+            correctAnswer: 'Жақсы, рахмет',
+          },
+          {
+            id: 's1-l1-t7',
+            type: 'MULTIPLE_CHOICE',
+            question: 'Как по-казахски будет «До свидания»?',
+            options: ['Сау болыңыз', 'Қош келдіңіз', 'Рахмет'],
+            correctAnswer: 'Сау болыңыз',
+          },
+          {
+            id: 's1-l1-t8',
+            type: 'MULTIPLE_CHOICE',
+            question: 'Что означает «Қалайсың?»?',
+            options: ['Как дела?', 'Как вас зовут?', 'Где?'],
+            correctAnswer: 'Как дела?',
+          },
+        ],
+      },
+      {
+        id: 's1-l2',
+        title: 'Прощания',
+        sectionId: 'section-1',
+        points: 2,
+        tasks: [
+          {
+            id: 's1-l2-t1',
+            type: 'MULTIPLE_CHOICE',
+            question: 'Как переводится слово «Сау бол»?',
+            options: ['Здравствуй', 'До свидания', 'Спасибо', 'Извини'],
+            correctAnswer: 'До свидания',
+          },
+          {
+            id: 's1-l2-t2',
+            type: 'SENTENCE_BUILDER',
+            question: 'Составь предложение из слов: До скорой встречи',
+            words: ['Көріскенше!'],
+            correctAnswer: 'Көріскенше!',
+          },
+          {
+            id: 's1-l2-t3',
+            type: 'TRUE_FALSE',
+            question: 'Верно ли утверждение? «Сау болыңыз!» может использоваться как «Будьте здоровы».',
+            correctAnswer: true,
+          },
+          {
+            id: 's1-l2-t4',
+            type: 'ODD_ONE_OUT',
+            question: 'Какое слово НЕ относится к прощанию?',
+            options: ['Сау бол', 'Көріскенше', 'Қош', 'Сәлем'],
+            correctAnswer: 'Сәлем',
+            explanation: 'Сәлем - это приветствие.',
+          },
+          {
+            id: 's1-l2-t5',
+            type: 'MATCH_PAIRS',
+            question: 'Соотнеси слова и переводы.',
+            pairs: [
+              { prompt: 'Сау бол', answer: 'До свидания' },
+              { prompt: 'Көріскенше', answer: 'До встречи' },
+            ],
+          },
+          {
+            id: 's1-l2-t6',
+            type: 'DIALOGUE_COMPLETION',
+            question: 'Как логично завершить фразу? «Жақсы болыңыз, мен кетемін.» → …',
+            options: ['Сау болыңыз!', 'Қош келдіңіз!', 'Рахмет!'],
+            correctAnswer: 'Сау болыңыз!',
+          },
+          {
+            id: 's1-l2-t7',
+            type: 'MULTIPLE_CHOICE',
+            question: 'Как по-казахски сказать «Пока» другу?',
+            options: ['Көріскенше', 'Сау бол', 'Қош'],
+            correctAnswer: 'Сау бол',
+          },
+          {
+            id: 's1-l2-t8',
+            type: 'MULTIPLE_CHOICE',
+            question: 'Как переводится «До скорого»?',
+            options: ['Жақында көрісеміз', 'Қош келдіңіз', 'Сау болыңыз'],
+            correctAnswer: 'Жақында көрісеміз',
+          },
+        ],
+      },
+      {
+        id: 's1-l3',
+        title: 'Как дела?',
+        sectionId: 'section-1',
+        points: 2,
+        tasks: [
+          {
+            id: 's1-l3-t1',
+            type: 'MULTIPLE_CHOICE',
+            question: 'Что означает вопрос «Қалайсың?»?',
+            options: ['Как дела?', 'Как тебя зовут?', 'Где ты?', 'Кто ты?'],
+            correctAnswer: 'Как дела?',
+          },
+          {
+            id: 's1-l3-t2',
+            type: 'SENTENCE_BUILDER',
+            question: 'Составь правильный ответ: Хорошо, спасибо, а ты?',
+            words: ['Жақсы,', 'рахмет,', 'сен ше?'],
+            correctAnswer: 'Жақсы, рахмет, сен ше?',
+          },
+          {
+            id: 's1-l3-t3',
+            type: 'TRUE_FALSE',
+            question: 'Верно ли утверждение? «Сіз қалайсыз?» = «Как ты?»',
+            correctAnswer: false,
+            explanation: 'Это вежливое «Как Вы?».',
+          },
+          {
+            id: 's1-l3-t4',
+            type: 'ODD_ONE_OUT',
+            question: 'Какое слово НЕ является вопросом о состоянии?',
+            options: ['Қалайсың?', 'Қалайсыз?', 'Не жаңалық?', 'Сәлем'],
+            correctAnswer: 'Сәлем',
+            explanation: 'Сәлем - это приветствие.',
+          },
+          {
+            id: 's1-l3-t5',
+            type: 'MATCH_PAIRS',
+            question: 'Соотнеси слова и переводы.',
+            pairs: [
+              { prompt: 'Қалайсың?', answer: 'Как дела?' },
+              { prompt: 'Жақсы', answer: 'Хорошо' },
+              { prompt: 'Нашар', answer: 'Плохо' },
+            ],
+          },
+          {
+            id: 's1-l3-t6',
+            type: 'DIALOGUE_COMPLETION',
+            question: 'Как правильно продолжить фразу? «Менің жағдайым жақсы…»',
+            options: ['ал сенікі?', 'сау бол!', 'рахмет!'],
+            correctAnswer: 'ал сенікі?',
+          },
+          {
+            id: 's1-l3-t7',
+            type: 'MULTIPLE_CHOICE',
+            question: 'Что означает «Жақсы»?',
+            options: ['Плохо', 'Хорошо', 'Нормально'],
+            correctAnswer: 'Хорошо',
+          },
+          {
+            id: 's1-l3-t8',
+            type: 'MULTIPLE_CHOICE',
+            question: 'Когда используется слово «Рахмет»?',
+            options: ['При вопросе', 'Для выражения благодарности', 'При прощании'],
+            correctAnswer: 'Для выражения благодарности',
+          },
+        ],
+      },
+      // Placeholder lessons for Section 1
+      ...Array.from({ length: 7 }, (_, i) => ({
+        id: `s1-l${i + 4}`,
+        title: `Урок ${i + 4}`,
+        sectionId: 'section-1',
+        points: 2,
+        tasks: [],
+      })),
+    ],
+  },
+  {
+    id: 'section-2',
+    title: 'Раздел 2 (в разработке)',
+    totalPoints: 50,
+    lessons: [
+       // Placeholder lessons for Section 2
+       ...Array.from({ length: 10 }, (_, i) => ({
+        id: `s2-l${i + 1}`,
+        title: `Урок ${i + 1}`,
+        sectionId: 'section-2',
+        points: 5,
+        tasks: [],
+      })),
+    ],
+  },
+];

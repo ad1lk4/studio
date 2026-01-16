@@ -1,3 +1,28 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero",
+      "description": "Hero image for the landing page",
+      "imageUrl": "https://images.unsplash.com/photo-1698420475875-6d838697083b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8a2F6YWtoc3RhbiUyMGxhbmRzY2FwZXxlbnwwfHx8fDE3Njg1MzUzOTV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "kazakhstan landscape"
+    },
+    {
+      "id": "feature-1",
+      "description": "Feature image for interactive lessons",
+      "imageUrl": "https://images.unsplash.com/photo-1589395937658-0557e7d89fad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxsZWFybmluZyUyMGxhbmd1YWdlfGVufDB8fHx8MTc2ODQ3MTkzN3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "learning language"
+    },
+    {
+      "id": "feature-2",
+      "description": "Feature image for progress tracking",
+      "imageUrl": "https://images.unsplash.com/photo-1730382624709-81e52dd294d4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8cHJvZ3Jlc3MlMjBjaGFydHxlbnwwfHx8fDE3Njg0ODE0NDd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "progress chart"
+    },
+    {
+      "id": "feature-3",
+      "description": "Feature image for leaderboard",
+      "imageUrl": "https://images.unsplash.com/photo-1667205462612-09a2e51d29ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx0cm9waHklMjB3aW5uZXJ8ZW58MHx8fHwxNzY4NTIzNDk4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "trophy winner"
+    }
+  ]
 }
