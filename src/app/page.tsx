@@ -13,17 +13,11 @@ const feature3Image = PlaceHolderImages.find((img) => img.id === 'feature-3');
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
-      <section className="relative w-full py-20 md:py-32 lg:py-40 text-white">
-        {heroImage && (
-          <Image
-            src={heroImage.imageUrl}
-            alt={heroImage.description}
-            fill
-            className="object-cover"
-            data-ai-hint={heroImage.imageHint}
-            priority
-          />
-        )}
+      <section
+        className="relative w-full py-20 md:py-32 lg:py-40 text-white bg-cover bg-center"
+        style={{ backgroundImage: heroImage ? `url('${heroImage.imageUrl}')` : 'none' }}
+        data-ai-hint={heroImage?.imageHint}
+      >
         <div className="absolute inset-0 bg-black/60" />
         <div className="container relative z-10 mx-auto px-4 md:px-6 text-center">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
