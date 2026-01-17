@@ -17,7 +17,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <Link href="/" className="mr-6 flex items-center gap-2">
-          <img src="https://i.ibb.co/pW3C9M1/seyle-logo.png" alt="Sөyle! Logo" className="w-10 h-10" />
+          <img src="https://avatars.mds.yandex.net/get-kinopoisk-image/1777765/7de3aae1-3d89-4fde-a3e7-db62080b36c7/1920x" alt="Sөyle! Logo" className="w-10 h-10 object-cover rounded-full" />
           <span className="font-bold text-lg">Sөyle!</span>
         </Link>
         <nav className="flex items-center gap-6 text-sm">
