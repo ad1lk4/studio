@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
 
 const navItems = [
   { href: '/learn', label: 'Обучение' },
@@ -18,7 +17,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <Link href="/" className="mr-6 flex items-center gap-2">
-          <Image
+          <img
             src="https://drive.google.com/uc?export=view&id=1rON7SbVuoVdLJhF9F5m11vy26dsWq0Lp"
             alt="Sөyle! Logo"
             width={40}
