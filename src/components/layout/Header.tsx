@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { KazakhOrnament } from '../KazakhOrnament';
 
 const navItems = [
   { href: '/learn', label: 'Обучение' },
@@ -18,7 +17,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <Link href="/" className="mr-6 flex items-center gap-2">
-          <KazakhOrnament className="w-10 h-10 text-primary" />
+          <img src="https://i.ibb.co/pW3C9M1/seyle-logo.png" alt="Sөyle! Logo" className="w-10 h-10" />
           <span className="font-bold text-lg">Sөyle!</span>
         </Link>
         <nav className="flex items-center gap-6 text-sm">
