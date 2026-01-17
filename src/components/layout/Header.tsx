@@ -18,7 +18,7 @@ export default function Header() {
       <div className="container flex h-16 items-center">
         <Link href="/" className="mr-6 flex items-center gap-2">
           <img
-            src="https://i.ibb.co/L8T9x8d/photo-2024-07-26-17-48-52.jpg"
+            src="https://iimg.su/d/oGO3uXKuhx6XIcX92qbXVVUbHV8m6tVh0Wop2cmG"
             alt="Sөyle! Logo"
             width={40}
             height={40}
