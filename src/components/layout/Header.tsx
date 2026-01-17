@@ -18,11 +18,11 @@ export default function Header() {
       <div className="container flex h-16 items-center">
         <Link href="/" className="mr-6 flex items-center gap-2">
           <img
-            src="https://i.ibb.co/dKqfKHt/zootopia-kazakh-logo.png"
+            src="https://i.ibb.co/WD1pCQP/logo.png"
             alt="Sөyle! Logo"
             width={40}
             height={40}
-            className="rounded-full"
+            className="rounded-full object-cover"
           />
           <span className="font-bold text-lg">Sөyle!</span>
         </Link>
