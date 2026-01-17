@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Mountain } from 'lucide-react';
+import Image from 'next/image';
 
 const navItems = [
   { href: '/learn', label: 'Обучение' },
@@ -18,7 +18,13 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <Link href="/" className="mr-6 flex items-center gap-2">
-          <Mountain className="h-6 w-6 text-primary" />
+          <Image
+            src="https://i.pinimg.com/736x/81/2d/96/812d96c9c41284534f46a9479370776b.jpg"
+            alt="Sөyle! Logo"
+            width={40}
+            height={40}
+            className="rounded-full"
+          />
           <span className="font-bold text-lg">Sөyle!</span>
         </Link>
         <nav className="flex items-center gap-6 text-sm">
