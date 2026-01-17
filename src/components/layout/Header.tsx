@@ -19,7 +19,7 @@ export default function Header() {
       <div className="container flex h-16 items-center">
         <Link href="/" className="mr-6 flex items-center gap-2">
           <Image
-            src="https://i.pinimg.com/736x/81/2d/96/812d96c9c41284534f46a9479370776b.jpg"
+            src="https://drive.google.com/uc?export=view&id=1rON7SbVuoVdLJhF9F5m11vy26dsWq0Lp"
             alt="Sөyle! Logo"
             width={40}
             height={40}
