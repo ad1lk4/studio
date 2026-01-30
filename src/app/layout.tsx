@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import Header from '@/components/layout/Header';
 import { FirebaseClientProvider } from '@/firebase';
+import { ChatAssistant } from '@/components/ChatAssistant';
 
 const ptSans = PT_Sans({
   subsets: ['latin', 'cyrillic'],
@@ -29,6 +30,7 @@ export default function RootLayout({
           <div className="relative flex min-h-screen flex-col">
             <Header />
             <main className="flex-1">{children}</main>
+            <ChatAssistant />
           </div>
           <Toaster />
         </FirebaseClientProvider>
@@ -36,5 +38,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-    
