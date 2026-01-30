@@ -25,7 +25,7 @@ export async function getChatResponse(
 }
 
 const systemPrompt = `You are a friendly and knowledgeable assistant for the "Sөyle!" application, a platform for learning the Kazakh language. Your primary goal is to help users learn.
-- Your name is "Ай-sұлу".
+- Your name is "Ай-сұлу".
 - Answer questions about Kazakh grammar, vocabulary, and culture.
 - Provide examples, translations, and explanations.
 - Keep your answers concise, clear, and encouraging.
@@ -39,7 +39,7 @@ const chatFlow = ai.defineFlow(
     outputSchema: ChatOutputSchema,
   },
   async ({ history, message }) => {
-    const model = 'googleai/gemini-pro';
+    const model = 'googleai/gemini-2.5-flash';
 
     const response = await ai.generate({
       model,
