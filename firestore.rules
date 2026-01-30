@@ -1,0 +1,209 @@
+/**
+ * Core Philosophy: This ruleset enforces a hybrid security model. User-specific data
+ * (like profiles and progress) is protected by a strict ownership model, ensuring users can
+ * only access their own information. Publicly shared data, such as course content (sections,
+ * lessons, tasks) and the leaderboard, is readable by any authenticated user. All write
+ * operations on shared or administrative data are restricted to users with an 'admin' role.
+ *
+ * Data Structure: The data is organized for security and clarity. All private user data is
+ * nested under `/users/{userId}`. All public course content is nested under the top-level
+ * `/sections` collection. Global data, such as `/leaderboard_entries` and the admin role
+ * list `/roles_admin`, are stored in their own dedicated top-level collections.
+ *
+ * Key Security Decisions:
+ * - Admin Privileges: A user is considered an admin if a document with their UID exists
+ *   in the `/roles_admin` collection. Only admins can modify this collection.
+ * - Course Content Management: All course content under `/sections` is publicly readable
+ *   but can only be created, updated, or deleted by admins.
+ * - Leaderboard Integrity: The leaderboard is publicly readable, but write access is
+ *   restricted to admins to prevent users from manipulating their scores.
+ * - Default Posture: Unspecified paths or permissions default to denied access.
+ *
+ * Denormalization for Authorization: User progress documents at `/users/{userId}/progress/{progressId}`
+ * contain a denormalized `userId` field. This allows security rules to verify ownership
+ * directly from the document without needing a slow and costly `get()` call to a parent
+ * user document, simplifying rules and improving performance.
+ *
+ * Structural Segregation: The separation of private data (`/users/{userId}/progress`) from public
+ * data (`/sections`) is a deliberate choice. This prevents accidental data leakage and allows for
+ * efficient, secure list queries on the public collections without complex server-side filtering.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --------------------------------
+    // Helper Functions
+    // --------------------------------
+
+    /**
+     * Checks if the user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the currently authenticated user is an admin.
+     * Admin status is determined by the existence of their UID in the /roles_admin collection.
+     */
+    function isAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+    }
+
+    /**
+     * Checks if the authenticated user's UID matches the provided userId.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Ensures a document exists before an update or delete operation.
+     */
+    function docExists() {
+      return resource != null;
+    }
+
+    /**
+     * Ensures an incoming document's ownership field (`id`) matches the path `userId`.
+     * Used for validating relationship integrity on create.
+     */
+    function incomingUserLinkIsValid(userId) {
+      return request.resource.data.id == userId;
+    }
+
+    /**
+     * Ensures an existing document's ownership field (`id`) is not changed.
+     * Used for maintaining immutability on update.
+     */
+    function existingUserLinkIsUnchanged() {
+      return request.resource.data.id == resource.data.id;
+    }
+    
+    /**
+     * Ensures an incoming document's ownership field (`userId`) matches the path `userId`.
+     * Used for validating relationship integrity on create in subcollections.
+     */
+    function incomingProgressLinkIsValid(userId) {
+      return request.resource.data.userId == userId;
+    }
+    
+    /**
+     * Ensures an existing document's ownership field (`userId`) is not changed.
+     * Used for maintaining immutability on update in subcollections.
+     */
+    function existingProgressLinkIsUnchanged() {
+      return request.resource.data.userId == resource.data.userId;
+    }
+
+    // --------------------------------
+    // User Data Rules
+    // --------------------------------
+
+    /**
+     * @description Controls access to a user's own profile document.
+     * @path /users/{userId}
+     * @allow (create) An authenticated user creating their own profile document.
+     * @deny (update) A user trying to update another user's profile.
+     * @principle Enforces Self-Creation and Ownership for a user's root document.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+      allow create: if isOwner(userId) && incomingUserLinkIsValid(userId);
+      allow update: if (isOwner(userId) || isAdmin()) && docExists() && existingUserLinkIsUnchanged();
+      allow delete: if (isOwner(userId) || isAdmin()) && docExists();
+    }
+
+    /**
+     * @description Secures a user's lesson progress subcollection.
+     * @path /users/{userId}/progress/{progressId}
+     * @allow (create, update, delete) A user managing their own progress records.
+     * @deny (get, list) A user trying to read another user's progress.
+     * @principle Restricts access to a user's own private data tree and validates relational integrity.
+     */
+    match /users/{userId}/progress/{progressId} {
+      allow get, list: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && incomingProgressLinkIsValid(userId);
+      allow update: if (isOwner(userId) || isAdmin()) && docExists() && existingProgressLinkIsUnchanged();
+      allow delete: if (isOwner(userId) || isAdmin()) && docExists();
+    }
+
+    // --------------------------------
+    // Public Course Content Rules (Admin-Managed)
+    // --------------------------------
+
+    /**
+     * @description Manages course sections. Publicly readable, but only writable by admins.
+     * @path /sections/{sectionId}
+     * @allow (get, list) Any signed-in user reading course sections.
+     * @deny (create, update, delete) A non-admin user trying to modify course content.
+     * @principle Provides public read access while centralizing content management to admins.
+     */
+    match /sections/{sectionId} {
+      allow get, list: if isSignedIn();
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin() && docExists();
+    }
+
+    /**
+     * @description Manages lessons within a section. Publicly readable, only writable by admins.
+     * @path /sections/{sectionId}/lessons/{lessonId}
+     * @allow (get, list) Any signed-in user reading lessons.
+     * @deny (create) A non-admin user trying to add a new lesson.
+     * @principle Inherits the security model of the parent collection for consistency.
+     */
+    match /sections/{sectionId}/lessons/{lessonId} {
+      allow get, list: if isSignedIn();
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin() && docExists();
+    }
+
+    /**
+     * @description Manages tasks within a lesson. Publicly readable, only writable by admins.
+     * @path /sections/{sectionId}/lessons/{lessonId}/tasks/{taskId}
+     * @allow (get, list) Any signed-in user reading tasks.
+     * @deny (update) A non-admin user trying to change a task's question.
+     * @principle Inherits the security model of the parent collection for consistency.
+     */
+    match /sections/{sectionId}/lessons/{lessonId}/tasks/{taskId} {
+      allow get, list: if isSignedIn();
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin() && docExists();
+    }
+
+    // --------------------------------
+    // Global Data Rules
+    // --------------------------------
+
+    /**
+     * @description Manages the global leaderboard. Publicly readable, admin-only writes.
+     * @path /leaderboard_entries/{leaderboardEntryId}
+     * @allow (get, list) Any signed-in user viewing the leaderboard.
+     * @deny (create, update) A user trying to add or modify their own leaderboard score.
+     * @principle Protects data integrity by preventing client-side score manipulation.
+     */
+    match /leaderboard_entries/{leaderboardEntryId} {
+      allow get, list: if isSignedIn();
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin() && docExists();
+    }
+
+    // --------------------------------
+    // Administrative Rules
+    // --------------------------------
+
+    /**
+     * @description Manages admin role assignments. Only admins can read or write.
+     * @path /roles_admin/{userId}
+     * @allow (create, delete) An existing admin granting or revoking admin rights for another user.
+     * @deny (get, list, create) Any non-admin user attempting to view or modify admin roles.
+     * @principle Secures the role-based access control system itself.
+     */
+    match /roles_admin/{userId} {
+      allow get, list: if isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+  }
+}

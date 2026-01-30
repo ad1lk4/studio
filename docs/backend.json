@@ -1,0 +1,342 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the KazakhLingua application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user entity."
+        },
+        "username": {
+          "type": "string",
+          "description": "The username of the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the user.",
+          "format": "email"
+        },
+        "xp": {
+          "type": "number",
+          "description": "The total experience points (XP) earned by the user."
+        }
+      },
+      "required": [
+        "id",
+        "username",
+        "email",
+        "xp"
+      ]
+    },
+    "Section": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Section",
+      "type": "object",
+      "description": "Represents a section in the Kazakh language course.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the section entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the section (e.g., 'Basic Words and Phrases')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the section's content."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description"
+      ]
+    },
+    "Lesson": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Lesson",
+      "type": "object",
+      "description": "Represents a lesson within a section of the Kazakh language course.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the lesson entity."
+        },
+        "sectionId": {
+          "type": "string",
+          "description": "Reference to Section. (Relationship: Section 1:N Lesson)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the lesson (e.g., 'Greetings')."
+        },
+        "lessonNumber": {
+          "type": "number",
+          "description": "The lesson number within the section."
+        }
+      },
+      "required": [
+        "id",
+        "sectionId",
+        "name",
+        "lessonNumber"
+      ]
+    },
+    "Task": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Task",
+      "type": "object",
+      "description": "Represents a task within a lesson.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the task entity."
+        },
+        "lessonId": {
+          "type": "string",
+          "description": "Reference to Lesson. (Relationship: Lesson 1:N Task)"
+        },
+        "taskType": {
+          "type": "string",
+          "description": "The type of task (e.g., 'translation', 'sentence construction', 'true/false')."
+        },
+        "question": {
+          "type": "string",
+          "description": "The question or instructions for the task."
+        },
+        "correctAnswer": {
+          "type": "string",
+          "description": "The correct answer for the task."
+        },
+        "options": {
+          "type": "array",
+          "description": "Possible options for the task (e.g multiple choice questions).",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "lessonId",
+        "taskType",
+        "question",
+        "correctAnswer"
+      ]
+    },
+    "UserProgress": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProgress",
+      "type": "object",
+      "description": "Represents a user's progress in a specific lesson.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user progress entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N UserProgress)"
+        },
+        "lessonId": {
+          "type": "string",
+          "description": "Reference to Lesson. (Relationship: Lesson 1:N UserProgress)"
+        },
+        "completed": {
+          "type": "boolean",
+          "description": "Indicates whether the user has completed the lesson."
+        },
+        "score": {
+          "type": "number",
+          "description": "The user's score on the lesson."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "lessonId",
+        "completed",
+        "score"
+      ]
+    },
+    "LeaderboardEntry": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "LeaderboardEntry",
+      "type": "object",
+      "description": "Represents an entry in the leaderboard.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the leaderboard entry."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N LeaderboardEntry)"
+        },
+        "rank": {
+          "type": "number",
+          "description": "The user's rank on the leaderboard."
+        },
+        "xp": {
+          "type": "number",
+          "description": "The user's total XP."
+        },
+        "lastUpdate": {
+          "type": "string",
+          "description": "Last time the XP was updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "rank",
+        "xp",
+        "lastUpdate"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles. The 'userId' parameter identifies the user. This is private data, accessible only by the user and admins.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/sections/{sectionId}",
+        "definition": {
+          "entityName": "Section",
+          "schema": {
+            "$ref": "#/backend/entities/Section"
+          },
+          "description": "Stores sections of the Kazakh language course. Accessible to all users.",
+          "params": [
+            {
+              "name": "sectionId",
+              "description": "The unique identifier for the section."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/sections/{sectionId}/lessons/{lessonId}",
+        "definition": {
+          "entityName": "Lesson",
+          "schema": {
+            "$ref": "#/backend/entities/Lesson"
+          },
+          "description": "Stores lessons within a specific section. Accessible to all users.",
+          "params": [
+            {
+              "name": "sectionId",
+              "description": "The unique identifier for the section."
+            },
+            {
+              "name": "lessonId",
+              "description": "The unique identifier for the lesson."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/sections/{sectionId}/lessons/{lessonId}/tasks/{taskId}",
+        "definition": {
+          "entityName": "Task",
+          "schema": {
+            "$ref": "#/backend/entities/Task"
+          },
+          "description": "Stores tasks within a specific lesson. Accessible to all users.",
+          "params": [
+            {
+              "name": "sectionId",
+              "description": "The unique identifier for the section."
+            },
+            {
+              "name": "lessonId",
+              "description": "The unique identifier for the lesson."
+            },
+            {
+              "name": "taskId",
+              "description": "The unique identifier for the task."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/progress/{progressId}",
+        "definition": {
+          "entityName": "UserProgress",
+          "schema": {
+            "$ref": "#/backend/entities/UserProgress"
+          },
+          "description": "Stores user progress for specific lessons. The 'userId' parameter in the path and the 'userId' property in the document are denormalized to ensure authorization independence. Only the user can access their own progress.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "progressId",
+              "description": "The unique identifier for the user progress entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/leaderboard_entries/{leaderboardEntryId}",
+        "definition": {
+          "entityName": "LeaderboardEntry",
+          "schema": {
+            "$ref": "#/backend/entities/LeaderboardEntry"
+          },
+          "description": "Stores leaderboard entries. Accessible to all users for reading leaderboard rankings.",
+          "params": [
+            {
+              "name": "leaderboardEntryId",
+              "description": "The unique identifier for the leaderboard entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Documents in this collection represent admin users. The mere existence of a document for a given UID grants admin privileges. This is checked in security rules.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the admin user."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to support the KazakhLingua application, focusing on secure access, scalability, and maintainability. The structure adheres to the core design principles of Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), QAPs (Rules are not Filters), and Invariants.\n\n**Authorization Independence:** Achieved through denormalization. For example, access to `UserProgress` is determined by the `userId` within the document itself, avoiding the need for `get()` calls to the `/users/{userId}` document. This ensures atomic operations and simplifies security rules.\n\n**Structural Segregation:** Each collection stores data with a consistent security posture. User-specific data resides under `/users/{userId}`, while global data like `sections` is stored separately.\n\n**Access Modeling:** Employs path-based ownership for user-owned data (e.g., `/users/{userId}/progress/{progressId}`) and a membership map is not needed because the user progresses belongs to the user, and the structure already clearly represents this.\n\n**QAPs Support:** Segregation of data into different collections based on access needs ensures secure `list` operations. For example, listing lessons within a section is a simple query on the `/sections/{sectionId}/lessons` collection, without requiring complex filtering in security rules.\n\n**Global Roles (DBAC):** The system uses dedicated collections for global roles, `/roles_admin/{uid}`.\n\n**Data Clarity and Predictability:** Explicit state modeling is encouraged. Although not currently present, if a status field is needed, it should be a single dedicated field (e.g., 'DRAFT', 'PUBLISHED'). The schema is predictable with static keys, and semantic naming conventions are followed.\n\n**Leaderboard:** The leaderboard data is stored in a separate collection (`/leaderboard_entries`) to optimize leaderboard queries. Each entry stores the `userId` and `xp` for ranking purposes."
+  }
+}
