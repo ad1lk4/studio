@@ -4,6 +4,10 @@ import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/firebase"
+import { createUserWithEmailAndPassword } from "firebase/auth"
+import { createUserProfileDocument } from "@/lib/user"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -26,6 +30,8 @@ const formSchema = z.object({
 
 export function SignUpForm() {
   const { toast } = useToast();
+  const router = useRouter();
+  const auth = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -36,12 +42,26 @@ export function SignUpForm() {
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
-    toast({
-        title: "Регистрация успешна!",
-        description: "Добро пожаловать в Sөyle! (демо)",
-    });
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
+        if (userCredential.user) {
+            await createUserProfileDocument(userCredential.user, values.username);
+        }
+        toast({
+            title: "Регистрация успешна!",
+            description: "Добро пожаловать в Sөyle!",
+        });
+        router.push('/learn');
+        router.refresh();
+    } catch(error: any) {
+        console.error("Error signing up:", error);
+        toast({
+            variant: "destructive",
+            title: "Ошибка регистрации",
+            description: error.message || "Не удалось создать аккаунт.",
+        });
+    }
   }
 
   return (
@@ -62,7 +82,7 @@ export function SignUpForm() {
                 <FormItem>
                   <FormLabel>Имя пользователя</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ваше имя" {...field} />
+                    <Input placeholder="Ваше имя" {...field} className="text-black"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -75,7 +95,7 @@ export function SignUpForm() {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="email@example.com" {...field} />
+                    <Input placeholder="email@example.com" {...field} className="text-black"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -88,14 +108,14 @@ export function SignUpForm() {
                 <FormItem>
                   <FormLabel>Пароль</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                    <Input type="password" placeholder="••••••••" {...field} className="text-black"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">
-              Создать аккаунт
+            <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? 'Создание аккаунта...' : 'Создать аккаунт'}
             </Button>
           </form>
         </Form>
@@ -109,3 +129,5 @@ export function SignUpForm() {
     </Card>
   )
 }
+
+    

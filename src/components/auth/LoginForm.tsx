@@ -4,6 +4,9 @@ import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import { useRouter } from "next/navigation"
+import { signInWithEmailAndPassword } from "firebase/auth"
+import { useAuth } from "@/firebase"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -25,6 +28,8 @@ const formSchema = z.object({
 
 export function LoginForm() {
   const { toast } = useToast();
+  const router = useRouter();
+  const auth = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -34,12 +39,23 @@ export function LoginForm() {
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
-    toast({
-        title: "Вход",
-        description: "Вы успешно вошли в систему! (демо)",
-    });
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      await signInWithEmailAndPassword(auth, values.email, values.password);
+      toast({
+          title: "Вход",
+          description: "Вы успешно вошли в систему!",
+      });
+      router.push('/learn');
+      router.refresh(); // To update header state
+    } catch(error: any) {
+        console.error(error);
+        toast({
+            variant: "destructive",
+            title: "Ошибка входа",
+            description: error.message || "Не удалось войти. Проверьте свои данные.",
+        });
+    }
   }
 
   return (
@@ -60,7 +76,7 @@ export function LoginForm() {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="email@example.com" {...field} />
+                    <Input placeholder="email@example.com" {...field} className="text-black" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -73,14 +89,14 @@ export function LoginForm() {
                 <FormItem>
                   <FormLabel>Пароль</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                    <Input type="password" placeholder="••••••••" {...field} className="text-black" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">
-              Войти
+            <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? 'Вход...' : 'Войти'}
             </Button>
           </form>
         </Form>
@@ -94,3 +110,5 @@ export function LoginForm() {
     </Card>
   )
 }
+
+    
