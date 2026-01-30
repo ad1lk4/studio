@@ -6,10 +6,11 @@ import { Progress } from '@/components/ui/progress';
 import TaskDisplay from './TaskDisplay';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
-import { CheckCircle, XCircle, Award, Star } from 'lucide-react';
+import { CheckCircle, XCircle, Award, Star, Volume2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useProgress } from '@/hooks/use-progress';
 import Confetti from 'react-confetti';
+import { speak } from '@/lib/tts';
 
 type AnswerStatus = 'unanswered' | 'correct' | 'incorrect';
 
@@ -89,7 +90,18 @@ export default function LessonPlayer({ lesson }: { lesson: Lesson }) {
       <div className="flex-grow flex items-center justify-center p-4">
         <Card className="w-full max-w-2xl">
           <CardContent className="p-6">
-            <h2 className="text-xl font-bold mb-4">{currentTask.question}</h2>
+            <div className="flex items-center gap-2 mb-4">
+                <h2 className="text-xl font-bold">{currentTask.question}</h2>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => speak(currentTask.question)}
+                    aria-label="Прослушать вопрос"
+                    className="shrink-0"
+                >
+                    <Volume2 className="h-6 w-6 text-primary" />
+                </Button>
+            </div>
             <TaskDisplay task={currentTask} onAnswerChange={setUserAnswer} status={answerStatus} />
           </CardContent>
         </Card>

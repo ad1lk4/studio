@@ -9,6 +9,8 @@ import { cn } from '@/lib/utils';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { Volume2 } from 'lucide-react';
+import { speak } from '@/lib/tts';
 
 type AnswerStatus = 'unanswered' | 'correct' | 'incorrect';
 
@@ -39,14 +41,27 @@ const MultipleChoice = ({ task, onAnswerChange, status }: TaskDisplayProps & { t
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {task.options.map((option) => (
-         <Button
-            key={option}
-            variant="outline"
-            className={cn("h-auto p-4 justify-start text-left whitespace-normal", getButtonClass(selected === option, status, option === task.correctAnswer))}
-            onClick={() => handleClick(option)}
-        >
-          {option}
-        </Button>
+        <div key={option} className="flex items-center gap-2">
+            <Button
+                variant="outline"
+                className={cn("h-auto p-4 flex-grow justify-start text-left whitespace-normal", getButtonClass(selected === option, status, option === task.correctAnswer))}
+                onClick={() => handleClick(option)}
+            >
+            {option}
+            </Button>
+            <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    speak(option);
+                }}
+                aria-label={`Прослушать: ${option}`}
+                className="shrink-0"
+            >
+                <Volume2 className="h-6 w-6 text-primary" />
+            </Button>
+        </div>
       ))}
     </div>
   );
@@ -107,12 +122,40 @@ const SentenceBuilder = ({ task, onAnswerChange, status }: TaskDisplayProps & { 
     <div className='space-y-8'>
         <div className='min-h-[6rem] border-b-2 p-4 flex flex-wrap gap-2 items-center'>
             {builtSentence.map((word, index) => (
-                <Button key={`${word}-${index}`} variant="outline" onClick={() => removeWord(word, index)} className="text-lg">{word}</Button>
+                <div key={`${word}-${index}`} className="flex items-center gap-1">
+                    <Button variant="outline" onClick={() => removeWord(word, index)} className="text-lg">{word}</Button>
+                     <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            speak(word);
+                        }}
+                        aria-label={`Прослушать: ${word}`}
+                        className="shrink-0 h-9 w-9"
+                    >
+                        <Volume2 className="h-5 w-5 text-primary" />
+                    </Button>
+                </div>
             ))}
         </div>
         <div className='flex flex-wrap gap-2 justify-center'>
             {wordBank.map(word => (
-                <Button key={word} variant="secondary" onClick={() => addWord(word)} className="text-lg">{word}</Button>
+                 <div key={word} className="flex items-center gap-1">
+                    <Button variant="secondary" onClick={() => addWord(word)} className="text-lg">{word}</Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            speak(word);
+                        }}
+                        aria-label={`Прослушать: ${word}`}
+                        className="shrink-0 h-9 w-9"
+                    >
+                        <Volume2 className="h-5 w-5 text-primary" />
+                    </Button>
+                </div>
             ))}
         </div>
     </div>
@@ -153,27 +196,49 @@ const MatchPairs = ({ task, onAnswerChange, status }: TaskDisplayProps & { task:
   }
 
   return (
-    <div className='grid grid-cols-2 gap-8'>
+    <div className='grid grid-cols-2 gap-4 md:gap-8'>
         <div className='space-y-2'>
             {prompts.map(prompt => (
-                <Button
-                    key={prompt}
-                    variant={isMatched(prompt, 'prompt') ? (getPairStatus(matchedPairs.find(p=>p.startsWith(prompt))!) === 'correct' ? 'default': 'destructive') : (selectedPrompt === prompt ? 'outline' : 'secondary')}
-                    onClick={() => handlePromptClick(prompt)}
-                    disabled={status !== 'unanswered' && isMatched(prompt, 'prompt')}
-                    className={cn('w-full justify-center', {'ring-2 ring-primary': selectedPrompt === prompt})}
-                >{prompt}</Button>
+                <div key={prompt} className="flex items-center gap-2">
+                    <Button
+                        key={prompt}
+                        variant={isMatched(prompt, 'prompt') ? (getPairStatus(matchedPairs.find(p=>p.startsWith(prompt))!) === 'correct' ? 'default': 'destructive') : (selectedPrompt === prompt ? 'outline' : 'secondary')}
+                        onClick={() => handlePromptClick(prompt)}
+                        disabled={status !== 'unanswered' && isMatched(prompt, 'prompt')}
+                        className={cn('w-full justify-center', {'ring-2 ring-primary': selectedPrompt === prompt})}
+                    >{prompt}</Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => { e.stopPropagation(); speak(prompt, 'ru-RU'); }}
+                        aria-label={`Прослушать: ${prompt}`}
+                        className="shrink-0"
+                    >
+                        <Volume2 className="h-5 w-5 text-primary" />
+                    </Button>
+                </div>
             ))}
         </div>
         <div className='space-y-2'>
             {answers.map(answer => (
-                <Button
-                    key={answer}
-                    variant={isMatched(answer, 'answer') ? (getPairStatus(matchedPairs.find(p=>p.endsWith(answer))!) === 'correct' ? 'default': 'destructive') : 'secondary'}
-                    onClick={() => handleAnswerClick(answer)}
-                    disabled={status !== 'unanswered' && (isMatched(answer, 'answer') || !selectedPrompt)}
-                    className='w-full justify-center'
-                >{answer}</Button>
+                <div key={answer} className="flex items-center gap-2">
+                    <Button
+                        key={answer}
+                        variant={isMatched(answer, 'answer') ? (getPairStatus(matchedPairs.find(p=>p.endsWith(answer))!) === 'correct' ? 'default': 'destructive') : 'secondary'}
+                        onClick={() => handleAnswerClick(answer)}
+                        disabled={status !== 'unanswered' && (isMatched(answer, 'answer') || !selectedPrompt)}
+                        className='w-full justify-center'
+                    >{answer}</Button>
+                     <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => { e.stopPropagation(); speak(answer); }}
+                        aria-label={`Прослушать: ${answer}`}
+                        className="shrink-0"
+                    >
+                        <Volume2 className="h-5 w-5 text-primary" />
+                    </Button>
+                </div>
             ))}
         </div>
     </div>
