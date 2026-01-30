@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Table,
   TableBody,
@@ -9,19 +11,11 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Trophy } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-
-const leaderboardData = [
-  { rank: 1, user: "Айсулу", xp: 1520, avatar: "A" },
-  { rank: 2, user: "Бекзат", xp: 1480, avatar: "Б" },
-  { rank: 3, user: "Гаухар", xp: 1350, avatar: "Г" },
-  { rank: 4, user: "Данияр", xp: 1200, avatar: "Д" },
-  { rank: 5, user: "Ермек", xp: 1150, avatar: "Е" },
-  { rank: 6, user: "Жанар", xp: 1090, avatar: "Ж" },
-  { rank: 7, user: "Зере", xp: 980, avatar: "З" },
-  { rank: 8, user: "Кайрат", xp: 850, avatar: "К" },
-  { rank: 9, user: "Ляззат", xp: 760, avatar: "Л" },
-  { rank: 10, user: "Марат", xp: 720, avatar: "М" },
-];
+import { useCollection, useFirebase, useMemoFirebase } from "@/firebase"
+import { collection, query, orderBy, limit } from "firebase/firestore"
+import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const getMedal = (rank: number) => {
   if (rank === 1) return <Trophy className="w-6 h-6 text-yellow-500" />;
@@ -31,6 +25,71 @@ const getMedal = (rank: number) => {
 }
 
 export default function LeaderboardPage() {
+  const { firestore, user, isUserLoading: isAuthLoading } = useFirebase();
+
+  const leaderboardQuery = useMemoFirebase(
+    () => (firestore && user) ? query(collection(firestore, 'users'), orderBy('xp', 'desc'), limit(10)) : null,
+    [firestore, user]
+  );
+
+  const { data: leaderboardData, isLoading: isLeaderboardLoading } = useCollection<{username: string, xp: number, id: string}>(leaderboardQuery);
+
+  const isLoading = isAuthLoading || isLeaderboardLoading;
+
+  const renderContent = () => {
+    if (isLoading) {
+      return Array.from({ length: 5 }).map((_, index) => (
+        <TableRow key={index}>
+            <TableCell className="text-center"><Skeleton className="h-6 w-6 rounded-full mx-auto" /></TableCell>
+            <TableCell>
+                <div className="flex items-center gap-3">
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <Skeleton className="h-4 w-32" />
+                </div>
+            </TableCell>
+            <TableCell className="text-right"><Skeleton className="h-6 w-16 ml-auto" /></TableCell>
+        </TableRow>
+      ));
+    }
+
+    if (!user) {
+        return (
+            <TableRow>
+                <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
+                    <p className="mb-4">Пожалуйста, войдите, чтобы увидеть таблицу лидеров.</p>
+                    <Button asChild><Link href="/login">Войти</Link></Button>
+                </TableCell>
+            </TableRow>
+        );
+    }
+
+    if (!leaderboardData || leaderboardData.length === 0) {
+        return (
+            <TableRow>
+              <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
+                В таблице лидеров пока пусто. Начните обучение, чтобы попасть сюда!
+              </TableCell>
+            </TableRow>
+        );
+    }
+    
+    return leaderboardData.map((entry, index) => (
+        <TableRow key={entry.id} className="font-medium">
+            <TableCell className="text-center">{getMedal(index + 1)}</TableCell>
+            <TableCell>
+            <div className="flex items-center gap-3">
+                <Avatar>
+                    <AvatarImage src={`https://api.dicebear.com/8.x/bottts/svg?seed=${entry.id}`} />
+                <AvatarFallback>{entry.username.charAt(0).toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <span>{entry.username}</span>
+            </div>
+            </TableCell>
+            <TableCell className="text-right text-lg">{entry.xp}</TableCell>
+        </TableRow>
+    ));
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 md:px-6 lg:py-12">
       <Card className="max-w-4xl mx-auto">
@@ -50,21 +109,7 @@ export default function LeaderboardPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {leaderboardData.map((entry) => (
-                <TableRow key={entry.rank} className="font-medium">
-                  <TableCell className="text-center">{getMedal(entry.rank)}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Avatar>
-                         <AvatarImage src={`https://picsum.photos/seed/${entry.user}/40/40`} />
-                        <AvatarFallback>{entry.avatar}</AvatarFallback>
-                      </Avatar>
-                      <span>{entry.user}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right text-lg">{entry.xp}</TableCell>
-                </TableRow>
-              ))}
+              {renderContent()}
             </TableBody>
           </Table>
         </CardContent>

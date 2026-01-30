@@ -110,7 +110,7 @@ service cloud.firestore {
      */
     match /users/{userId} {
       allow get: if isOwner(userId) || isAdmin();
-      allow list: if isAdmin();
+      allow list: if isSignedIn();
       allow create: if isOwner(userId) && incomingUserLinkIsValid(userId);
       allow update: if (isOwner(userId) || isAdmin()) && docExists() && existingUserLinkIsUnchanged();
       allow delete: if (isOwner(userId) || isAdmin()) && docExists();
