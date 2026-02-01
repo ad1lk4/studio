@@ -87,7 +87,7 @@ export function ChatAssistant() {
                 {messages.map((message, index) => (
                     <div key={index} className={cn("flex items-start gap-3", message.role === 'user' ? 'justify-end' : 'justify-start')}>
                         {message.role === 'model' && <div className="p-2 rounded-full bg-secondary"><Bot className="w-5 h-5 shrink-0 text-secondary-foreground" /></div>}
-                         <div className={cn("p-3 rounded-lg max-w-[85%]", message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted')}>
+                         <div className={cn("p-3 rounded-lg max-w-[85%]", message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-accent text-accent-foreground')}>
                             <p className="text-sm whitespace-pre-wrap">{message.text}</p>
                          </div>
                         {message.role === 'user' && <div className="p-2 rounded-full bg-secondary"><UserIcon className="w-5 h-5 shrink-0 text-secondary-foreground" /></div>}
