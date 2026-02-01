@@ -80,14 +80,14 @@ const TrueFalse = ({ task, onAnswerChange, status }: TaskDisplayProps & { task: 
         <div className="flex gap-4">
              <Button
                 variant="outline"
-                className={cn("h-auto p-4 flex-1 text-lg", getButtonClass(selected === true, status, task.correctAnswer === true))}
+                className={cn("h-auto p-4 flex-1 text-base md:text-lg", getButtonClass(selected === true, status, task.correctAnswer === true))}
                 onClick={() => handleClick(true)}
             >
               Верно
             </Button>
             <Button
                 variant="outline"
-                className={cn("h-auto p-4 flex-1 text-lg", getButtonClass(selected === false, status, task.correctAnswer === false))}
+                className={cn("h-auto p-4 flex-1 text-base md:text-lg", getButtonClass(selected === false, status, task.correctAnswer === false))}
                 onClick={() => handleClick(false)}
             >
               Неверно
@@ -123,7 +123,7 @@ const SentenceBuilder = ({ task, onAnswerChange, status }: TaskDisplayProps & { 
         <div className='min-h-[6rem] border-b-2 p-4 flex flex-wrap gap-2 items-center'>
             {builtSentence.map((word, index) => (
                 <div key={`${word}-${index}`} className="flex items-center gap-1">
-                    <Button variant="outline" onClick={() => removeWord(word, index)} className="text-lg">{word}</Button>
+                    <Button variant="outline" onClick={() => removeWord(word, index)} className="h-auto whitespace-normal text-base md:text-lg p-2">{word}</Button>
                      <Button
                         variant="ghost"
                         size="icon"
@@ -142,7 +142,7 @@ const SentenceBuilder = ({ task, onAnswerChange, status }: TaskDisplayProps & { 
         <div className='flex flex-wrap gap-2 justify-center'>
             {wordBank.map(word => (
                  <div key={word} className="flex items-center gap-1">
-                    <Button variant="secondary" onClick={() => addWord(word)} className="text-lg">{word}</Button>
+                    <Button variant="secondary" onClick={() => addWord(word)} className="h-auto whitespace-normal text-base md:text-lg p-2">{word}</Button>
                     <Button
                         variant="ghost"
                         size="icon"
@@ -196,7 +196,7 @@ const MatchPairs = ({ task, onAnswerChange, status }: TaskDisplayProps & { task:
   }
 
   return (
-    <div className='grid grid-cols-2 gap-4 md:gap-8'>
+    <div className='grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8'>
         <div className='space-y-2'>
             {prompts.map(prompt => (
                 <div key={prompt} className="flex items-center gap-2">
@@ -205,7 +205,7 @@ const MatchPairs = ({ task, onAnswerChange, status }: TaskDisplayProps & { task:
                         variant={isMatched(prompt, 'prompt') ? (getPairStatus(matchedPairs.find(p=>p.startsWith(prompt))!) === 'correct' ? 'default': 'destructive') : (selectedPrompt === prompt ? 'outline' : 'secondary')}
                         onClick={() => handlePromptClick(prompt)}
                         disabled={status !== 'unanswered' && isMatched(prompt, 'prompt')}
-                        className={cn('w-full justify-center', {'ring-2 ring-primary': selectedPrompt === prompt})}
+                        className={cn('w-full justify-center h-auto whitespace-normal p-3', {'ring-2 ring-primary': selectedPrompt === prompt})}
                     >{prompt}</Button>
                     <Button
                         variant="ghost"
@@ -227,7 +227,7 @@ const MatchPairs = ({ task, onAnswerChange, status }: TaskDisplayProps & { task:
                         variant={isMatched(answer, 'answer') ? (getPairStatus(matchedPairs.find(p=>p.endsWith(answer))!) === 'correct' ? 'default': 'destructive') : 'secondary'}
                         onClick={() => handleAnswerClick(answer)}
                         disabled={status !== 'unanswered' && (isMatched(answer, 'answer') || !selectedPrompt)}
-                        className='w-full justify-center'
+                        className='w-full justify-center h-auto whitespace-normal p-3'
                     >{answer}</Button>
                      <Button
                         variant="ghost"
