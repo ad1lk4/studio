@@ -72,7 +72,7 @@ const ttsFlow = ai.defineFlow(
         speechConfig: {
           voiceConfig: {
             // Use a high-quality prebuilt voice. The model is multilingual.
-            prebuiltVoiceConfig: {voiceName: 'Algenib'},
+            prebuiltVoiceConfig: {voiceName: 'Ceres'},
           },
         },
       },
