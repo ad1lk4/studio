@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 const YANDEX_API_KEY = 'AQWJeNM_EUT0wOyAknBqlanAkFcU_ImOH3wttLRP';
-const YANDEX_FOLDER_ID = '<YOUR_YANDEX_FOLDER_ID>';
+const YANDEX_FOLDER_ID = 'ao778cjqlka6rltjut89';
 const YANDEX_TTS_URL = 'https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize';
 
 export async function POST(request: Request) {
