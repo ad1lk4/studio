@@ -7,7 +7,7 @@ let currentAudio: HTMLAudioElement | null = null;
  * Pronounces the given text using a server-side Yandex SpeechKit API route.
  * Caches the audio to prevent redundant API calls.
  * @param text The text to speak.
- * @param lang The language code (e.g., 'kk-KZ'), ignored in this version as it's set on the server.
+ * @param lang The language code (e.g., 'kk-KZ' or 'ru-RU').
  */
 export const speak = async (text: string, lang = 'kk-KZ') => {
   if (typeof window === 'undefined' || !window.Audio) {
@@ -24,10 +24,11 @@ export const speak = async (text: string, lang = 'kk-KZ') => {
     currentAudio.currentTime = 0;
   }
 
+  const cacheKey = `${lang}:${text}`;
   let audioUrl: string;
 
-  if (audioCache.has(text)) {
-    audioUrl = audioCache.get(text)!;
+  if (audioCache.has(cacheKey)) {
+    audioUrl = audioCache.get(cacheKey)!;
   } else {
     try {
       const response = await fetch('/api/tts', {
@@ -35,7 +36,7 @@ export const speak = async (text: string, lang = 'kk-KZ') => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text, lang }),
       });
 
       if (!response.ok) {
@@ -44,7 +45,7 @@ export const speak = async (text: string, lang = 'kk-KZ') => {
 
       const audioBlob = await response.blob();
       audioUrl = URL.createObjectURL(audioBlob);
-      audioCache.set(text, audioUrl);
+      audioCache.set(cacheKey, audioUrl);
 
     } catch (error) {
       console.error('Failed to fetch TTS audio:', error);

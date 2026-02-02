@@ -6,16 +6,18 @@ const YANDEX_TTS_URL = 'https://tts.api.cloud.yandex.net/speech/v1/tts:synthesiz
 
 export async function POST(request: Request) {
   try {
-    const { text } = await request.json();
+    const { text, lang = 'kk-KK' } = await request.json();
 
     if (!text) {
       return new NextResponse('Text is required', { status: 400 });
     }
 
+    const voice = lang === 'ru-RU' ? 'alena' : 'madi';
+
     const formData = new URLSearchParams();
     formData.append('text', text);
-    formData.append('lang', 'kk-KK');
-    formData.append('voice', 'madi');
+    formData.append('lang', lang);
+    formData.append('voice', voice);
     formData.append('format', 'mp3');
     formData.append('folderId', YANDEX_FOLDER_ID);
 
