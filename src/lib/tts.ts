@@ -1,4 +1,5 @@
 'use client';
+import { textToSpeech } from '@/ai/flows/ttsFlow';
 
 const audioCache = new Map<string, string>();
 const requestsInProgress = new Map<string, Promise<string>>();
@@ -17,34 +18,27 @@ const fetchAndCache = (text: string, lang = 'kk-KZ'): Promise<string> => {
     return requestsInProgress.get(cacheKey)!;
   }
 
-  // 3. Fetch new audio
-  const fetchPromise = fetch('/api/tts', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ text, lang }),
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error(`TTS service failed with status: ${response.status}`);
-    }
-    return response.blob();
-  })
-  .then(audioBlob => {
-    const audioUrl = URL.createObjectURL(audioBlob);
-    audioCache.set(cacheKey, audioUrl);
-    requestsInProgress.delete(cacheKey); // Clean up after success
-    return audioUrl;
-  })
-  .catch(error => {
-    requestsInProgress.delete(cacheKey); // Clean up after failure
-    // Re-throw the error to be caught by the caller (speak or preload)
-    throw error;
-  });
+  // 3. Call the Genkit flow
+  const flowPromise = textToSpeech(text, lang)
+    .then(result => {
+      if (!result || !result.media) {
+          throw new Error('TTS flow did not return media.');
+      }
+      // The result.media is a data URI, which can be used directly.
+      const audioUrl = result.media;
+      audioCache.set(cacheKey, audioUrl);
+      requestsInProgress.delete(cacheKey); // Clean up after success
+      return audioUrl;
+    })
+    .catch(error => {
+      console.error(`TTS service failed for text "${text}":`, error);
+      requestsInProgress.delete(cacheKey); // Clean up after failure
+      // Re-throw the error to be caught by the caller (speak or preload)
+      throw error;
+    });
 
-  requestsInProgress.set(cacheKey, fetchPromise);
-  return fetchPromise;
+  requestsInProgress.set(cacheKey, flowPromise);
+  return flowPromise;
 }
 
 /**
@@ -61,13 +55,14 @@ export const preload = async (text: string, lang = 'kk-KZ') => {
   try {
     await fetchAndCache(text, lang);
   } catch (error) {
+    // Log the error but don't rethrow, so one failure doesn't stop others.
     console.error(`Failed to preload audio for "${text}":`, error);
   }
 };
 
 
 /**
- * Pronounces the given text using a server-side API route.
+ * Pronounces the given text using the Genkit TTS flow.
  * Uses a cache to prevent redundant API calls.
  * @param text The text to speak.
  */
@@ -81,6 +76,7 @@ export const speak = async (text: string, lang = 'kk-KZ') => {
     return;
   }
   
+  // Stop any currently playing audio
   if (currentAudio) {
     currentAudio.pause();
     currentAudio.currentTime = 0;
@@ -91,7 +87,9 @@ export const speak = async (text: string, lang = 'kk-KZ') => {
     currentAudio = new Audio(audioUrl);
     currentAudio.play().catch(e => console.error("Audio playback failed:", e));
   } catch (error) {
-      console.error('Failed to fetch TTS audio:', error);
-      alert('Не удалось воспроизвести аудио. Пожалуйста, попробуйте еще раз.');
+      // The error is already logged in fetchAndCache
+      console.error('Failed to get or play TTS audio:', error);
+      // Optionally, inform the user via UI
+      // alert('Не удалось воспроизвести аудио. Пожалуйста, попробуйте еще раз.');
   }
 };
