@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 const YANDEX_API_KEY = 'AQWJeNM_EUT0wOyAknBqlanAkFcU_ImOH3wttLRP';
+const YANDEX_FOLDER_ID = '<YOUR_YANDEX_FOLDER_ID>';
 const YANDEX_TTS_URL = 'https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize';
 
 export async function POST(request: Request) {
@@ -16,6 +17,7 @@ export async function POST(request: Request) {
     formData.append('lang', 'kk-KK');
     formData.append('voice', 'madi');
     formData.append('format', 'mp3');
+    formData.append('folderId', YANDEX_FOLDER_ID);
 
     const response = await fetch(YANDEX_TTS_URL, {
       method: 'POST',
