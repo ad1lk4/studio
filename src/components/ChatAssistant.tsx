@@ -79,7 +79,7 @@ export function ChatAssistant() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
                 <Bot />
-                Айсұлу, ваш AI-помощник
+                Aila-Foxy, ваш AI-помощник
             </DialogTitle>
           </DialogHeader>
           <ScrollArea className="flex-1 pr-4 -mr-4" viewportRef={scrollAreaRef}>
