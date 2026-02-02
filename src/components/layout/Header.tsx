@@ -83,7 +83,7 @@ export default function Header() {
         
         <div className="flex flex-1 items-center justify-end gap-4">
           {showStreak && (
-            <div className="flex items-center gap-1 font-bold text-sm text-orange-500">
+            <div className={cn("flex items-center gap-1 font-bold text-sm", progress.isStreakActiveToday ? "text-orange-500" : "text-slate-400")}>
                 <Flame className="w-5 h-5" />
                 <span>{progress.currentStreak}</span>
             </div>
@@ -171,7 +171,7 @@ export default function Header() {
                   ) : user ? (
                     <div className="flex flex-col gap-2">
                        {showStreak && (
-                          <div className="flex items-center justify-center gap-2 text-orange-500 font-bold rounded-md border border-orange-500/50 bg-orange-500/10 p-2 mb-2">
+                          <div className={cn("flex items-center justify-center gap-2 font-bold rounded-md border p-2 mb-2", progress.isStreakActiveToday ? "border-orange-500/50 bg-orange-500/10 text-orange-500" : "border-slate-500/50 bg-slate-500/10 text-slate-400")}>
                             <Flame className="w-5 h-5" />
                             <span>Дней подряд: {progress.currentStreak}</span>
                           </div>

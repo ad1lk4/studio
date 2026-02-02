@@ -11,6 +11,7 @@ interface Progress {
   xp: number;
   completedLessons: string[];
   currentStreak: number;
+  isStreakActiveToday: boolean;
 }
 
 interface ProgressContextType {
@@ -25,6 +26,7 @@ const initialProgress: Progress = {
   xp: 0,
   completedLessons: [],
   currentStreak: 0,
+  isStreakActiveToday: false,
 };
 
 export const ProgressProvider = ({ children }: { children: ReactNode }) => {
@@ -54,47 +56,6 @@ export const ProgressProvider = ({ children }: { children: ReactNode }) => {
   
   const { data: firestoreUserData, isLoading: isFirestoreLoading } = useDoc(userDocRef);
 
-  // Streak logic
-  useEffect(() => {
-    if (!user || !userDocRef || !firestoreUserData || isUserLoading || isFirestoreLoading) {
-      return;
-    }
-
-    const today = startOfDay(new Date());
-    const lastLoginDateStr = firestoreUserData.lastLoginDate;
-
-    if (lastLoginDateStr && isSameDay(parseISO(lastLoginDateStr), today)) {
-        return;
-    }
-
-    const yesterday = subDays(today, 1);
-    let newStreak = firestoreUserData.currentStreak || 0;
-    const lastLoginDate = lastLoginDateStr ? parseISO(lastLoginDateStr) : null;
-
-    if (lastLoginDate && isSameDay(lastLoginDate, yesterday)) {
-      newStreak++;
-    } else {
-      newStreak = 1;
-    }
-    
-    const todayStr = format(today, 'yyyy-MM-dd');
-
-    updateDoc(userDocRef, {
-      currentStreak: newStreak,
-      lastLoginDate: todayStr,
-    }).catch(error => {
-        errorEmitter.emit(
-          'permission-error',
-          new FirestorePermissionError({
-            path: userDocRef.path,
-            operation: 'update',
-            requestResourceData: { currentStreak: newStreak, lastLoginDate: todayStr },
-          })
-        )
-    });
-  }, [user, userDocRef, firestoreUserData, isUserLoading, isFirestoreLoading]);
-
-
   const saveLocalProgress = useCallback((newProgress: Progress) => {
     try {
       localStorage.setItem('soyleProgress', JSON.stringify(newProgress));
@@ -105,14 +66,33 @@ export const ProgressProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const completeLesson = useCallback((lessonId: string, points: number) => {
-    if (user && userDocRef) {
+    if (user && userDocRef && firestoreUserData) {
       // User is logged in, update Firestore
       if (firestoreUserData?.completedLessons?.includes(lessonId)) return;
+
+      const today = startOfDay(new Date());
+      const lastCompletionDateStr = firestoreUserData.lastLessonCompletionDate;
+      const lastCompletionDate = lastCompletionDateStr ? parseISO(lastCompletionDateStr) : null;
       
-      updateDoc(userDocRef, {
+      const updatePayload: any = {
         xp: increment(points),
         completedLessons: arrayUnion(lessonId),
-      }).catch(error => {
+      };
+
+      // Only update streak if a lesson hasn't been completed today
+      if (!lastCompletionDate || !isSameDay(lastCompletionDate, today)) {
+        const yesterday = subDays(today, 1);
+        const currentStreak = firestoreUserData.currentStreak || 0;
+        
+        const newStreak = (lastCompletionDate && isSameDay(lastCompletionDate, yesterday)) 
+            ? currentStreak + 1 
+            : 1;
+
+        updatePayload.currentStreak = newStreak;
+        updatePayload.lastLessonCompletionDate = format(today, 'yyyy-MM-dd');
+      }
+
+      updateDoc(userDocRef, updatePayload).catch(error => {
           errorEmitter.emit(
             'permission-error',
             new FirestorePermissionError({
@@ -132,6 +112,7 @@ export const ProgressProvider = ({ children }: { children: ReactNode }) => {
           ...prevProgress,
           xp: prevProgress.xp + points,
           completedLessons: [...prevProgress.completedLessons, lessonId],
+          isStreakActiveToday: false, // Streak not tracked for anonymous
         };
         saveLocalProgress(newProgress);
         return newProgress;
@@ -139,10 +120,15 @@ export const ProgressProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [user, userDocRef, firestoreUserData, saveLocalProgress]);
   
+  const isStreakActiveToday = user && firestoreUserData?.lastLessonCompletionDate
+    ? isSameDay(parseISO(firestoreUserData.lastLessonCompletionDate), new Date())
+    : false;
+    
   const progress = user && firestoreUserData ? {
       xp: firestoreUserData.xp ?? 0,
       completedLessons: firestoreUserData.completedLessons ?? [],
       currentStreak: firestoreUserData.currentStreak ?? 0,
+      isStreakActiveToday: isStreakActiveToday
   } : localProgress;
 
   useEffect(() => {

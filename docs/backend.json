@@ -34,9 +34,9 @@
           "type": "number",
           "description": "The user's current daily learning streak."
         },
-        "lastLoginDate": {
+        "lastLessonCompletionDate": {
           "type": "string",
-          "description": "The date of the user's last login, in 'yyyy-MM-dd' format.",
+          "description": "The date of the user's last lesson completion, in 'yyyy-MM-dd' format.",
           "format": "date"
         }
       },
@@ -45,8 +45,7 @@
         "username",
         "email",
         "xp",
-        "currentStreak",
-        "lastLoginDate"
+        "currentStreak"
       ]
     },
     "Section": {
