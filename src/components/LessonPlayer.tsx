@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Lesson, Task } from '@/lib/types';
 import { Progress } from '@/components/ui/progress';
 import TaskDisplay from './TaskDisplay';
@@ -10,7 +10,7 @@ import { CheckCircle, XCircle, Award, Star, Volume2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useProgress } from '@/hooks/use-progress';
 import Confetti from 'react-confetti';
-import { speak } from '@/lib/tts';
+import { preload, speak } from '@/lib/tts';
 
 type AnswerStatus = 'unanswered' | 'correct' | 'incorrect';
 
@@ -22,6 +22,39 @@ export default function LessonPlayer({ lesson }: { lesson: Lesson }) {
 
   const router = useRouter();
   const { completeLesson } = useProgress();
+
+  useEffect(() => {
+    const textsToPreload = new Map<string, string>(); // Map of text -> lang
+        
+    lesson.tasks.forEach(task => {
+        if (task.question) textsToPreload.set(task.question, 'kk-KZ');
+
+        switch (task.type) {
+            case 'MULTIPLE_CHOICE':
+            case 'ODD_ONE_OUT':
+            case 'DIALOGUE_COMPLETION':
+                task.options.forEach(o => textsToPreload.set(o, 'kk-KZ'));
+                break;
+            case 'SENTENCE_BUILDER':
+                task.words.forEach(w => textsToPreload.set(w, 'kk-KZ'));
+                break;
+            case 'MATCH_PAIRS':
+                task.pairs.forEach(p => {
+                    textsToPreload.set(p.prompt, 'ru-RU');
+                    textsToPreload.set(p.answer, 'kk-KZ');
+                });
+                break;
+        }
+    });
+
+    // Fire off all preload requests in parallel
+    const preloadPromises = Array.from(textsToPreload.entries()).map(([text, lang]) => preload(text, lang));
+    
+    Promise.all(preloadPromises).then(() => {
+        console.log("All audio for the lesson has been preloaded.");
+    });
+  }, [lesson]);
+
 
   const currentTask = lesson.tasks[currentTaskIndex];
   const isLessonFinished = currentTaskIndex >= lesson.tasks.length;
