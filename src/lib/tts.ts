@@ -1,62 +1,58 @@
 'use client';
 
-let voices: SpeechSynthesisVoice[] = [];
-
-const getVoices = () => {
-  if (typeof window !== 'undefined' && window.speechSynthesis) {
-    voices = window.speechSynthesis.getVoices();
-    return voices;
-  }
-  return [];
-};
-
-// Load voices initially and on change
-if (typeof window !== 'undefined' && window.speechSynthesis) {
-  getVoices();
-  if (window.speechSynthesis.onvoiceschanged !== undefined) {
-    window.speechSynthesis.onvoiceschanged = getVoices;
-  }
-}
+const audioCache = new Map<string, string>();
+let currentAudio: HTMLAudioElement | null = null;
 
 /**
- * Pronounces the given text using the browser's built-in Web Speech API.
- * This method is free and requires no API key.
- * Voice quality may vary depending on the browser and operating system.
+ * Pronounces the given text using a server-side Yandex SpeechKit API route.
+ * Caches the audio to prevent redundant API calls.
  * @param text The text to speak.
- * @param lang The language code (e.g., 'kk-KZ' for Kazakh).
+ * @param lang The language code (e.g., 'kk-KZ'), ignored in this version as it's set on the server.
  */
-export const speak = (text: string, lang = 'kk-KZ') => {
-  // Check for browser support
-  if (typeof window === 'undefined' || !window.speechSynthesis) {
-    console.error('Browser does not support the Web Speech API.');
-    alert('Ваш браузер не поддерживает озвучку текста.');
+export const speak = async (text: string, lang = 'kk-KZ') => {
+  if (typeof window === 'undefined' || !window.Audio) {
+    console.error('Browser does not support the Audio API.');
     return;
   }
 
-  // Prevent empty or whitespace-only strings from being processed.
   if (!text || text.trim() === '') {
-    console.log('[TTS] Skipped empty text.');
     return;
   }
-
-  // Cancel any currently speaking utterances
-  window.speechSynthesis.cancel();
-
-  // Create a new utterance
-  const utterance = new SpeechSynthesisUtterance(text);
   
-  // Set the language
-  utterance.lang = lang;
-
-  // Attempt to find a specific voice for the given language
-  // We check for the primary language subtag (e.g., 'kk' from 'kk-KZ')
-  const voice = voices.find(v => v.lang.startsWith(lang.split('-')[0]));
-  if (voice) {
-    utterance.voice = voice;
-  } else {
-    console.warn(`[TTS] No specific voice for lang="${lang}" found. Using browser default for the language.`);
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
   }
-  
-  // Speak the text
-  window.speechSynthesis.speak(utterance);
+
+  let audioUrl: string;
+
+  if (audioCache.has(text)) {
+    audioUrl = audioCache.get(text)!;
+  } else {
+    try {
+      const response = await fetch('/api/tts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`TTS service failed with status: ${response.status}`);
+      }
+
+      const audioBlob = await response.blob();
+      audioUrl = URL.createObjectURL(audioBlob);
+      audioCache.set(text, audioUrl);
+
+    } catch (error) {
+      console.error('Failed to fetch TTS audio:', error);
+      alert('Не удалось воспроизвести аудио. Пожалуйста, попробуйте еще раз.');
+      return;
+    }
+  }
+
+  currentAudio = new Audio(audioUrl);
+  currentAudio.play().catch(e => console.error("Audio playback failed:", e));
 };
