@@ -5,10 +5,12 @@ import { useFirebase, useMemoFirebase, useDoc } from '@/firebase';
 import { doc, updateDoc, increment, arrayUnion } from 'firebase/firestore';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
+import { format, isSameDay, subDays, startOfDay, parseISO } from 'date-fns';
 
 interface Progress {
   xp: number;
   completedLessons: string[];
+  currentStreak: number;
 }
 
 interface ProgressContextType {
@@ -22,6 +24,7 @@ const ProgressContext = createContext<ProgressContextType | undefined>(undefined
 const initialProgress: Progress = {
   xp: 0,
   completedLessons: [],
+  currentStreak: 0,
 };
 
 export const ProgressProvider = ({ children }: { children: ReactNode }) => {
@@ -32,15 +35,17 @@ export const ProgressProvider = ({ children }: { children: ReactNode }) => {
 
   // Load local progress from localStorage
   useEffect(() => {
-    try {
-      const savedProgress = localStorage.getItem('soyleProgress');
-      if (savedProgress) {
-        setLocalProgress(JSON.parse(savedProgress));
-      }
-    } catch (error) {
-      console.error('Failed to load progress from localStorage', error);
-    }
-  }, []);
+     if (!user) {
+        try {
+        const savedProgress = localStorage.getItem('soyleProgress');
+        if (savedProgress) {
+            setLocalProgress(JSON.parse(savedProgress));
+        }
+        } catch (error) {
+        console.error('Failed to load progress from localStorage', error);
+        }
+     }
+  }, [user]);
 
   const userDocRef = useMemoFirebase(
     () => (user ? doc(firestore, 'users', user.uid) : null),
@@ -48,6 +53,47 @@ export const ProgressProvider = ({ children }: { children: ReactNode }) => {
   );
   
   const { data: firestoreUserData, isLoading: isFirestoreLoading } = useDoc(userDocRef);
+
+  // Streak logic
+  useEffect(() => {
+    if (!user || !userDocRef || !firestoreUserData || isUserLoading || isFirestoreLoading) {
+      return;
+    }
+
+    const today = startOfDay(new Date());
+    const lastLoginDateStr = firestoreUserData.lastLoginDate;
+
+    if (lastLoginDateStr && isSameDay(parseISO(lastLoginDateStr), today)) {
+        return;
+    }
+
+    const yesterday = subDays(today, 1);
+    let newStreak = firestoreUserData.currentStreak || 0;
+    const lastLoginDate = lastLoginDateStr ? parseISO(lastLoginDateStr) : null;
+
+    if (lastLoginDate && isSameDay(lastLoginDate, yesterday)) {
+      newStreak++;
+    } else {
+      newStreak = 1;
+    }
+    
+    const todayStr = format(today, 'yyyy-MM-dd');
+
+    updateDoc(userDocRef, {
+      currentStreak: newStreak,
+      lastLoginDate: todayStr,
+    }).catch(error => {
+        errorEmitter.emit(
+          'permission-error',
+          new FirestorePermissionError({
+            path: userDocRef.path,
+            operation: 'update',
+            requestResourceData: { currentStreak: newStreak, lastLoginDate: todayStr },
+          })
+        )
+    });
+  }, [user, userDocRef, firestoreUserData, isUserLoading, isFirestoreLoading]);
+
 
   const saveLocalProgress = useCallback((newProgress: Progress) => {
     try {
@@ -83,6 +129,7 @@ export const ProgressProvider = ({ children }: { children: ReactNode }) => {
           return prevProgress; // Already completed
         }
         const newProgress = {
+          ...prevProgress,
           xp: prevProgress.xp + points,
           completedLessons: [...prevProgress.completedLessons, lessonId],
         };
@@ -92,16 +139,16 @@ export const ProgressProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [user, userDocRef, firestoreUserData, saveLocalProgress]);
   
-  const progress = user ? {
-      xp: firestoreUserData?.xp ?? 0,
-      completedLessons: firestoreUserData?.completedLessons ?? [],
+  const progress = user && firestoreUserData ? {
+      xp: firestoreUserData.xp ?? 0,
+      completedLessons: firestoreUserData.completedLessons ?? [],
+      currentStreak: firestoreUserData.currentStreak ?? 0,
   } : localProgress;
 
-  // Determine overall loading state
   useEffect(() => {
-      const loading = isUserLoading || (user && isFirestoreLoading && !firestoreUserData);
+      const loading = isUserLoading || (user && isFirestoreLoading);
       setIsLoading(loading);
-  },[isUserLoading, user, isFirestoreLoading, firestoreUserData]);
+  },[isUserLoading, user, isFirestoreLoading]);
 
 
   return React.createElement(ProgressContext.Provider, { value: { progress, completeLesson, isLoading } }, children);
@@ -114,5 +161,3 @@ export const useProgress = (): ProgressContextType => {
   }
   return context;
 };
-
-    

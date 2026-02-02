@@ -3,6 +3,7 @@
 import { doc, setDoc } from 'firebase/firestore';
 import type { User } from 'firebase/auth';
 import { firestore } from '@/firebase/client'; // Assuming you have a client-side firestore instance export
+import { format } from 'date-fns';
 
 /**
  * Creates a user document in the `users` collection after sign up.
@@ -14,12 +15,16 @@ export async function createUserProfileDocument(user: User, username: string) {
 
   const userRef = doc(firestore, 'users', user.uid);
 
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+
   const userData = {
     id: user.uid,
     username: username,
     email: user.email,
     xp: 0,
     completedLessons: [],
+    currentStreak: 1,
+    lastLoginDate: todayStr,
   };
 
   try {
@@ -30,5 +35,3 @@ export async function createUserProfileDocument(user: User, username: string) {
     throw new Error("Could not create user profile.");
   }
 }
-
-    

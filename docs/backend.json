@@ -29,13 +29,24 @@
           "items": {
             "type": "string"
           }
+        },
+        "currentStreak": {
+          "type": "number",
+          "description": "The user's current daily learning streak."
+        },
+        "lastLoginDate": {
+          "type": "string",
+          "description": "The date of the user's last login, in 'yyyy-MM-dd' format.",
+          "format": "date"
         }
       },
       "required": [
         "id",
         "username",
         "email",
-        "xp"
+        "xp",
+        "currentStreak",
+        "lastLoginDate"
       ]
     },
     "Section": {
@@ -347,5 +358,3 @@
     "reasoning": "The Firestore data structure is designed to support the KazakhLingua application, focusing on secure access, scalability, and maintainability. The structure adheres to the core design principles of Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), QAPs (Rules are not Filters), and Invariants.\n\n**Authorization Independence:** Achieved through denormalization. For example, access to `UserProgress` is determined by the `userId` within the document itself, avoiding the need for `get()` calls to the `/users/{userId}` document. This ensures atomic operations and simplifies security rules.\n\n**Structural Segregation:** Each collection stores data with a consistent security posture. User-specific data resides under `/users/{userId}`, while global data like `sections` is stored separately.\n\n**Access Modeling:** Employs path-based ownership for user-owned data (e.g., `/users/{userId}/progress/{progressId}`) and a membership map is not needed because the user progresses belongs to the user, and the structure already clearly represents this.\n\n**QAPs Support:** Segregation of data into different collections based on access needs ensures secure `list` operations. For example, listing lessons within a section is a simple query on the `/sections/{sectionId}/lessons` collection, without requiring complex filtering in security rules.\n\n**Global Roles (DBAC):** The system uses dedicated collections for global roles, `/roles_admin/{uid}`.\n\n**Data Clarity and Predictability:** Explicit state modeling is encouraged. Although not currently present, if a status field is needed, it should be a single dedicated field (e.g., 'DRAFT', 'PUBLISHED'). The schema is predictable with static keys, and semantic naming conventions are followed.\n\n**Leaderboard:** The leaderboard data is stored in a separate collection (`/leaderboard_entries`) to optimize leaderboard queries. Each entry stores the `userId` and `xp` for ranking purposes."
   }
 }
-
-    

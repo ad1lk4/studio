@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import Header from '@/components/layout/Header';
 import { FirebaseClientProvider } from '@/firebase';
 import { ChatAssistant } from '@/components/ChatAssistant';
+import { ProgressProvider } from '@/hooks/use-progress';
 
 const ptSans = PT_Sans({
   subsets: ['latin', 'cyrillic'],
@@ -27,12 +28,14 @@ export default function RootLayout({
     <html lang="ru" suppressHydrationWarning>
       <body className={cn('min-h-screen bg-background font-sans antialiased', ptSans.variable)}>
         <FirebaseClientProvider>
-          <div className="relative flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1">{children}</main>
-            <ChatAssistant />
-          </div>
-          <Toaster />
+          <ProgressProvider>
+            <div className="relative flex min-h-screen flex-col">
+              <Header />
+              <main className="flex-1">{children}</main>
+              <ChatAssistant />
+            </div>
+            <Toaster />
+          </ProgressProvider>
         </FirebaseClientProvider>
       </body>
     </html>

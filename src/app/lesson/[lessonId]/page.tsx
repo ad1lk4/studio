@@ -1,7 +1,6 @@
 import { sections } from '@/lib/lessons';
 import { notFound } from 'next/navigation';
 import LessonPlayer from '@/components/LessonPlayer';
-import { ProgressProvider } from '@/hooks/use-progress';
 
 type LessonPageProps = {
   params: {
@@ -20,9 +19,7 @@ export default function LessonPage({ params }: LessonPageProps) {
   }
 
   return (
-    <ProgressProvider>
-        <LessonPlayer lesson={lesson} />
-    </ProgressProvider>
+    <LessonPlayer lesson={lesson} />
   );
 }
 
