@@ -25,7 +25,7 @@ const getButtonClass = (isSelected: boolean, status: AnswerStatus, isCorrect: bo
     if (isSelected) {
         return isCorrect ? 'bg-green-500 hover:bg-green-500 text-white' : 'bg-red-500 hover:bg-red-500 text-white';
     }
-    if (status !== 'unanswered' && isCorrect) return 'bg-green-500 hover:bg-green-500 text-white';
+    if (isCorrect) return 'bg-green-500 hover:bg-green-500 text-white';
     return 'bg-secondary hover:bg-muted';
 }
 
@@ -210,7 +210,7 @@ const MatchPairs = ({ task, onAnswerChange, status }: TaskDisplayProps & { task:
                     <Button
                         variant="ghost"
                         size="icon"
-                        onClick={(e) => { e.stopPropagation(); speak(prompt, 'ru-RU'); }}
+                        onClick={(e) => { e.stopPropagation(); speak(prompt); }}
                         aria-label={`Прослушать: ${prompt}`}
                         className="shrink-0"
                     >

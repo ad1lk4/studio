@@ -1,39 +1,84 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// --- НАСТРОЙКИ ---
-// Сотри 'ВСТАВЬ_СЮДА...' и вставь свой ключ, который начинается на AQVN...
-const YANDEX_API_KEY = 'AQWJeNM_EUT0wOyAknBqlanAkFcU_ImOH3wttLRP'; 
-const FOLDER_ID = 'ao778cjqlka6rltjut89'; 
-// ----------------
-
 export async function POST(req: NextRequest) {
   try {
-      const { text } = await req.json();
+    const apiKey = process.env.YANDEX_TTS_API_KEY;
+    const voiceName = process.env.YANDEX_TTS_VOICE ?? 'saule'; 
 
-          const params = new URLSearchParams();
-              params.append('text', text);
-                  params.append('lang', 'kk-KK');
-                      params.append('voice', 'madi'); // Голос
-                          params.append('format', 'mp3');
-                              params.append('folderId', FOLDER_ID);
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: 'YANDEX_TTS_API_KEY не задан в .env' },
+        { status: 503 }
+      );
+    }
 
-                                  const response = await fetch('https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize', {
-                                        method: 'POST',
-                                              headers: {
-                                                      'Authorization': `Api-Key ${YANDEX_API_KEY}`, 
-                                                            },
-                                                                  body: params,
-                                                                      });
+    const body = await req.json();
+    const text = typeof body?.text === 'string' ? body.text.trim() : '';
 
-                                                                          if (!response.ok) {
-                                                                                return NextResponse.json({ error: await response.text() }, { status: response.status });
-                                                                                    }
+    if (!text) {
+      return NextResponse.json({ error: 'Текст не передан' }, { status: 400 });
+    }
 
-                                                                                        return new NextResponse(await response.arrayBuffer(), {
-                                                                                              headers: { 'Content-Type': 'audio/mpeg' },
-                                                                                                  });
+    const requestBody = {
+      text: text,
+      outputAudioSpec: {
+        containerAudio: {
+          containerAudioType: 'MP3'
+        }
+      },
+      hints: [
+        { voice: voiceName },
+        { speed: 1.0 }
+      ]
+    };
 
-                                                                                                    } catch (error) {
-                                                                                                        return NextResponse.json({ error: 'Server Error' }, { status: 500 });
-                                                                                                          }
-                                                                                                          }
+    const url = 'https://tts.api.ml.yandexcloud.kz/tts/v3/utteranceSynthesis';
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Api-Key ${apiKey.trim()}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error(`[TTS KZ V3] HTTP Error: ${response.status}`, errorBody);
+      return NextResponse.json(
+        { error: `Ошибка синтеза (KZ V3 API): ${errorBody}` },
+        { status: response.status }
+      );
+    }
+
+    const responseData = await response.json();
+
+    const audioChunk = 
+      responseData.result?.audioChunk || 
+      responseData.audioChunk || 
+      responseData.result?.audio_chunk || 
+      responseData.audio_chunk;
+
+    if (!audioChunk || !audioChunk.data) {
+      console.error('[TTS] Некорректная структура ответа:', JSON.stringify(responseData).substring(0, 500));
+      return NextResponse.json(
+        { error: 'Пустой ответ от TTS (нет audioChunk)', debug: responseData }, 
+        { status: 502 }
+      );
+    }
+
+    const audioBuffer = Buffer.from(audioChunk.data, 'base64');
+
+    return new NextResponse(audioBuffer, {
+      headers: { 
+        'Content-Type': 'audio/mpeg',
+        'Content-Length': audioBuffer.length.toString()
+      },
+    });
+
+  } catch (error) {
+    console.error('[TTS] Server Error:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}

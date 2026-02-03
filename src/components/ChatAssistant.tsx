@@ -12,8 +12,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageCircle, Send, Bot, User as UserIcon, LoaderCircle } from 'lucide-react';
-import { getChatResponse } from '@/ai/flows/chatFlow';
-import type { Message } from 'genkit/content';
+import { getChatResponse, type ChatHistoryMessage } from '@/ai/flows/chatFlow';
 import { cn } from '@/lib/utils';
 
 type ChatMessage = {
@@ -47,7 +46,7 @@ export function ChatAssistant() {
     setIsLoading(true);
 
     try {
-        const history: Message[] = messages.map(msg => ({
+        const history: ChatHistoryMessage[] = messages.map(msg => ({
             role: msg.role,
             content: [{ text: msg.text }]
         }));

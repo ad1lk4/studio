@@ -1,40 +1,54 @@
 'use client';
 
-// 1. Основная функция озвучки (которую мы писали)
 export const speak = async (text: string) => {
-  if (!text) return;
+  if (!text?.trim()) return;
 
-    try {
-        console.log("🔊 Отправляем запрос в Яндекс:", text);
+  try {
+    const response = await fetch('/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text.trim() }),
+    });
 
-            const response = await fetch('/api/tts', {
-                  method: 'POST',
-                        headers: {
-                                'Content-Type': 'application/json',
-                                      },
-                                            body: JSON.stringify({ text }),
-                                                });
+    if (!response.ok) {
+      let message = `Ошибка ${response.status}`;
+      try {
+        const json = await response.json();
+        if (json.debug) {
+            console.error('TTS V3 Response Structure:', json.debug);
+        }
+        message = json.error || message;
+      } catch (e) {
+        message = await response.text();
+      }
+      console.error(`Ошибка озвучки:`, message);
+      return;
+    }
 
-                                                    if (!response.ok) {
-                                                          console.error("Ошибка API озвучки:", await response.text());
-                                                                return;
-                                                                    }
+    const blob = await response.blob();
+    
+    if (blob.type.includes('application/json')) {
+        const errorText = await blob.text();
+        console.error('Сервер вернул JSON вместо аудио:', errorText);
+        return;
+    }
 
-                                                                        const blob = await response.blob();
-                                                                            const audioUrl = URL.createObjectURL(blob);
-                                                                                const audio = new Audio(audioUrl);
-                                                                                    
-                                                                                        await audio.play();
+    const audioUrl = URL.createObjectURL(blob);
+    const audio = new Audio(audioUrl);
 
-                                                                                          } catch (error) {
-                                                                                              console.error("Сбой воспроизведения:", error);
-                                                                                                }
-                                                                                                };
+    audio.onended = () => URL.revokeObjectURL(audioUrl);
+    audio.onerror = (e) => {
+      URL.revokeObjectURL(audioUrl);
+      console.error('Ошибка воспроизведения аудио (onerror)', e);
+    };
 
-                                                                                                // 2. ВАЖНО: Добавляем функцию preload, чтобы сайт не ругался
-                                                                                                // Мы делаем её пустой ("заглушкой"), чтобы просто убрать ошибку Build Error
-                                                                                                export const preload = async (text: string) => {
-                                                                                                  // Тут ничего не происходит, это нормально.
-                                                                                                    // Главное, что функция существует и экспортируется.
-                                                                                                      console.log("Preloading skipped for:", text);
-                                                                                                      };
+    await audio.play();
+
+  } catch (error) {
+    console.error('Сбой speak():', error);
+  }
+};
+
+export const preload = async (text: string) => {
+  console.log('Preload skipped:', text);
+};

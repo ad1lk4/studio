@@ -3,13 +3,11 @@ import { notFound } from 'next/navigation';
 import LessonPlayer from '@/components/LessonPlayer';
 
 type LessonPageProps = {
-  params: {
-    lessonId: string;
-  };
+  params: Promise<{ lessonId: string }>;
 };
 
-export default function LessonPage({ params }: LessonPageProps) {
-  const { lessonId } = params;
+export default async function LessonPage({ params }: LessonPageProps) {
+  const { lessonId } = await params;
   const lesson = sections
     .flatMap((section) => section.lessons)
     .find((l) => l.id === lessonId);

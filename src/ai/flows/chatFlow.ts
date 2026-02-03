@@ -5,7 +5,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
-import {Message} from 'genkit/content';
 
 const ChatInputSchema = z.object({
   history: z.array(z.object({
@@ -17,8 +16,11 @@ const ChatInputSchema = z.object({
 
 const ChatOutputSchema = z.string();
 
+/** History format for chat: array of { role, content } for ai.generate messages. */
+export type ChatHistoryMessage = z.infer<typeof ChatInputSchema>['history'][number];
+
 export async function getChatResponse(
-  history: Message[],
+  history: ChatHistoryMessage[],
   message: string
 ): Promise<string> {
   return chatFlow({ history, message });
@@ -45,7 +47,7 @@ const chatFlow = ai.defineFlow(
     const response = await ai.generate({
       model,
       system: systemPrompt,
-      history: history,
+      messages: history,
       prompt: message,
     });
 

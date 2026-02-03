@@ -48,7 +48,7 @@ export default function LessonPlayer({ lesson }: { lesson: Lesson }) {
     });
 
     // Fire off all preload requests in parallel
-    const preloadPromises = Array.from(textsToPreload.entries()).map(([text, lang]) => preload(text, lang));
+    const preloadPromises = Array.from(textsToPreload.keys()).map((text) => preload(text));
     
     Promise.all(preloadPromises).then(() => {
         console.log("All audio for the lesson has been preloaded.");

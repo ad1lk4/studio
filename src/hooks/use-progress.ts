@@ -132,7 +132,7 @@ export const ProgressProvider = ({ children }: { children: ReactNode }) => {
   } : localProgress;
 
   useEffect(() => {
-      const loading = isUserLoading || (user && isFirestoreLoading);
+      const loading = Boolean(isUserLoading || (user && isFirestoreLoading));
       setIsLoading(loading);
   },[isUserLoading, user, isFirestoreLoading]);
 
