@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       },
       hints: [
         { voice: voiceName },
-        { speed: 1.0 }
+        { speed: 0.7 }
       ]
     };
 
