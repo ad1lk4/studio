@@ -67,10 +67,12 @@ export function ChatAssistant() {
     <>
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-lg z-50"
+        // Изменяем размеры h-16 w-16 на h-12 w-12 (чтобы стала компактнее)
+        // bottom-6 для мобилок, чтобы она была на одной линии с кнопкой проверить
+        className="fixed bottom-5 right-4 h-12 w-12 rounded-full shadow-lg z-50 md:h-16 md:w-16 md:bottom-6 md:right-6"
         size="icon"
       >
-        <MessageCircle className="h-8 w-8" />
+        <MessageCircle className="h-6 w-6 md:h-8 md:w-8" />
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>

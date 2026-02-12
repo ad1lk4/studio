@@ -141,23 +141,33 @@ export default function LessonPlayer({ lesson }: { lesson: Lesson }) {
       </div>
       
       {answerStatus !== 'unanswered' && (
-        <div className={`p-4 ${answerStatus === 'correct' ? 'bg-green-100 dark:bg-green-900/50' : 'bg-red-100 dark:bg-red-900/50'}`}>
-            <div className="container mx-auto flex items-center justify-between">
+        <div className={`p-4 border-t ${answerStatus === 'correct' ? 'bg-green-100 dark:bg-green-900/50' : 'bg-red-100 dark:bg-red-900/50'}`}>
+            <div className="container mx-auto flex flex-col items-center justify-center gap-3">
                 <div className="flex items-center gap-2">
                     {answerStatus === 'correct' ? <CheckCircle className="text-green-500" /> : <XCircle className="text-red-500" />}
                     <p className={`font-bold ${answerStatus === 'correct' ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}>
                         {answerStatus === 'correct' ? 'Правильно!' : 'Неверно.'}
                     </p>
                 </div>
-                <Button onClick={handleContinue}>Продолжить</Button>
+                
+                <Button 
+                  onClick={handleContinue} 
+                  className="px-12 py-6 text-lg w-2/3 md:w-auto"
+                >
+                  Продолжить
+                </Button>
             </div>
         </div>
       )}
 
       {answerStatus === 'unanswered' && (
-        <div className="p-4 border-t">
-          <div className="container mx-auto flex justify-end">
-            <Button onClick={handleCheckAnswer} disabled={userAnswer === null}>
+        <div className="p-4 border-t"> 
+          <div className="container mx-auto flex justify-center items-center">
+            <Button 
+              onClick={handleCheckAnswer} 
+              disabled={userAnswer === null}
+              className="px-12 py-6 text-lg w-2/3 md:w-auto" // w-2/3 сделает кнопку широкой и удобной на телефоне
+            >
               Проверить
             </Button>
           </div>
